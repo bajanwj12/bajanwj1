@@ -1,5 +1,4 @@
 name: Build Kivy App to APK
-# 触发条件，在 main 分支有推送或拉取请求合并时触发
 on:
   push:
     branches:
@@ -10,14 +9,16 @@ on:
 
 jobs:
   build-android:
-    runs-on: ubuntu - latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          ref: main
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.8  # 可根据需求调整 Python 版本
+          python-version: 3.8
       - name: Install Dependencies
         run: |
           sudo apt-get update
@@ -25,10 +26,9 @@ jobs:
           pip install buildozer
       - name: Build APK
         run: |
-          # 假设 buildozer.spec 在仓库根目录，若不在需调整路径
           buildozer -v android debug
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: apk-file
-          path: bin/*.apk  # 打包生成的 APK 文件路径，根据实际调整
+          path: bin/*.apk

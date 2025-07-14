@@ -32,6 +32,16 @@ jobs:
         run: pip install cython
       - name: Set ANDROID_HOME
         run: echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
+      - name: Install Android SDK Command-line Tools
+        run: |
+          mkdir -p $HOME/.android/cmdline-tools
+          cd $HOME/.android/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
+          unzip cmdline-tools.zip
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
+          mv cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+          export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
+          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0"
       - name: Build APK
         run: |
           buildozer -v android debug

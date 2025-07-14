@@ -52,7 +52,12 @@ jobs:
         run: |
           # 输出已安装的kivy版本，确认安装成功
           pip show kivy
+          # 打印即将执行的最后一个命令
+          echo "即将执行的构建命令：buildozer -v android debug"
+          # 执行构建命令
           buildozer -v android debug
+          # 若命令执行成功，打印完成信息
+          echo "构建命令执行完成"
       - name: 上传APK文件
         uses: actions/upload-artifact@v4
         with:

@@ -19,20 +19,20 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: 3.8
-      - name: Install Dependencies
+      - name: 安装基础依赖
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3-dev python3-pip virtualenv libssl-dev libffi-dev libsqlite3-dev zlib1g-dev
           pip install --upgrade buildozer python-for-android
-      - name: Install Python project dependencies
+      - name: 安装Python项目依赖
         run: |
           pip install kivy
           pip install -r requirements.txt  # 如果有依赖文件建议打开
-      - name: Install Cython
+      - name: 安装Cython
         run: pip install cython
-      - name: Set ANDROID_HOME
+      - name: 设置 ANDROID_HOME 环境变量
         run: echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-      - name: Install Android SDK Command-line Tools
+      - name: 安装 Android SDK 命令行工具
         run: |
           mkdir -p $HOME/.android/cmdline-tools
           cd $HOME/.android/cmdline-tools
@@ -42,19 +42,19 @@ jobs:
           mv cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
           export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
           yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      - name: Symlink sdkmanager for Buildozer compatibility
+      - name: 兼容 Buildozer 的 sdkmanager 软链接
         run: |
           mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
           ln -sf $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-      - name: Build APK
+      - name: 构建APK
         run: |
           buildozer -v android debug
-      - name: Upload Artifact
+      - name: 上传APK文件
         uses: actions/upload-artifact@v4
         with:
           name: apk-file
           path: bin/*.apk
-      - name: Upload Buildozer Log
+      - name: 上传 Buildozer 日志
         if: failure()
         uses: actions/upload-artifact@v4
         with:

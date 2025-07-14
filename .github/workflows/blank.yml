@@ -42,6 +42,10 @@ jobs:
           mv cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
           export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
           yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+      - name: Symlink sdkmanager for Buildozer compatibility
+        run: |
+          mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
+          ln -sf $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
       - name: Build APK
         run: |
           buildozer -v android debug

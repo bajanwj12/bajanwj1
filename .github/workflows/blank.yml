@@ -54,9 +54,3 @@ jobs:
         with:
           name: apk-file
           path: bin/*.apk
-      - name: 上传 Buildozer 日志
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: buildozer-log
-          path: ./.buildozer/android/platform/buildd/*.log

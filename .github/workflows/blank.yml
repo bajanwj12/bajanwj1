@@ -1,65 +1,30 @@
-name: Build Kivy App to APK
+name: Build Android APK with Buildozer Action
+
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Build with Buildozer Action
+        uses: ArtemSBulgakov/buildozer-action@v1.7.0  # 官方最新稳定版
         with:
-          ref: main
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
-      - name: 安装基础依赖
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3-dev python3-pip virtualenv libssl-dev libffi-dev libsqlite3-dev zlib1g-dev
-          pip install --upgrade buildozer python-for-android
-      - name: 安装Python项目依赖
-        run: |
-          pip install kivy
-          pip install -r requirements.txt  # 如果有依赖文件建议打开
-      - name: 安装Cython
-        run: pip install cython
-      - name: 再次安装kivy（确保依赖生效）
-        run: pip install kivy --upgrade  # 重复安装并升级，避免依赖冲突
-      - name: 设置 ANDROID_HOME 环境变量
-        run: echo "ANDROID_HOME=$HOME/.buildozer/android/platform/android-sdk" >> $GITHUB_ENV
-      - name: 安装 Android SDK 命令行工具
-        run: |
-          mkdir -p $HOME/.android/cmdline-tools
-          cd $HOME/.android/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
-          unzip cmdline-tools.zip
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/cmdline-tools
-          mv cmdline-tools $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-          export PATH=$HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin:$PATH
-          yes | $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/.buildozer/android/platform/android-sdk "platform-tools" "platforms;android-34" "build-tools;34.0.0"
-      - name: 兼容 Buildozer 的 sdkmanager 软链接
-        run: |
-          mkdir -p $HOME/.buildozer/android/platform/android-sdk/tools/bin
-          ln -sf $HOME/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager $HOME/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-      - name: 构建APK
-        run: |
-          # 输出已安装的kivy版本，确认安装成功
-          pip show kivy
-          # 打印即将执行的最后一个命令
-          echo "即将执行的构建命令：buildozer -v android debug"
-          # 执行构建命令
-          buildozer -v android debug
-          # 若命令执行成功，打印完成信息
-          echo "构建命令执行完成"
-      - name: 上传APK文件
+          command: android debug  # 执行 Android 调试版打包
+          buildozer_version: stable  # 使用稳定版 Buildozer
+          # 若需要指定 Python 版本（可选，默认适配当前环境）
+          python_version: 3.8
+          # 挂载项目目录到容器（默认已配置，确保代码能被访问）
+          workdir: .
+
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: apk-file
-          path: bin/*.apk
+          name: kivy-apk
+          path: bin/*.apk  # 打包生成的 APK 路径（与 buildozer.spec 中 bin_dir 一致）
